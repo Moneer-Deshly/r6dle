@@ -41,6 +41,7 @@ a {
   flex-grow: 1;
   display: grid;
   place-items: center;
+  margin-bottom: 12rem;
 }
 
 main {
@@ -64,7 +65,7 @@ main::before {
   background-position: center;
   filter: blur(2px);
   opacity: 0.5;
-  background-image: url("public/rainbow-six-siege-operators.jpg");
+  background-image: url("/rainbow-six-siege-operators.jpg");
 }
 
 </style>

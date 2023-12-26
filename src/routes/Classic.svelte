@@ -27,6 +27,15 @@ function autofill() {
         found = false
     }
 }
+
+function guess() {
+    console.log(`You have guessed ${inputField.value}!`)
+}
+
+function selectOption(optionName) {
+    inputField.value = optionName;
+    guess();
+}
 </script>
 
 <main>
@@ -36,15 +45,19 @@ function autofill() {
     </div>
     <div class = "game">
         <input on:input={autofill} bind:this={inputField} placeholder="Type operator name..."/>
-        <button class = "submit"><i class="fa-solid fa-arrow-right fa"></i></button>
+        <button on:click={guess} class = "submit"><i class="fa-solid fa-arrow-right fa"></i></button>
     </div>
     <div class = "dropdown">
-        <select id = "select-list">
+        <div id = "select-list" class={matches.length > 0 ? '' : 'hidden'}>
             {#each matches as option}
-                <option value="options">{option.name}</option>
-                <img src="opicons/${option.id}.png/">
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <!-- svelte-ignore a11y-no-static-element-interactions -->
+                <div class="operator-container" on:click={() => selectOption(option.name.toLowerCase())}>
+                    <div class="operator">{option.name}</div>
+                    <img class="operator-image" src="opicons/{option.id}.svg/" alt="">
+                </div>
             {/each}
-        </select>
+        </div>
         {#if (!found)}
         <div>
             No operators found.
@@ -70,6 +83,7 @@ input {
     font-size: 1.25em;
     border-radius: 1rem;
     border: 1rem;
+    background-color: #1a1a1a;
 }
 
 .game {
@@ -87,12 +101,56 @@ input {
     margin-bottom: 0rem;
 }
 
-select {
+.operator-container {
+    display: flex;
+    align-items: center; 
+    padding: 0.75rem;
     border-radius: 8px;
-    margin-top: 0.25em;
-    width: 100%;
-    height: 3.75rem;
-    font-size: 1em;
-    padding: 1rem;
+    cursor: pointer;
+}
+
+.operator-container:hover{
+    transition: 0.1s;
+    background-color: #333333;
+}
+
+#select-list {
+    max-height: 16.5rem;
+    width: 22rem;
+    position: fixed;
+    margin-top: 0.2em;
+    background-color: #1a1a1a; 
+    padding: 0.5rem; 
+    border-radius: 16px; 
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.hidden {
+    display: none;
+}
+
+img {
+    width: 40px;
+    height: 40px;
+}
+
+#select-list::-webkit-scrollbar-track {
+    background-color: #2e2e2e; 
+    border-radius: 10px; 
+}
+
+#select-list::-webkit-scrollbar-thumb {
+    background-color: #565656; 
+    border-radius: 10px; 
+    border: 3px solid #2e2e2e; 
+}
+
+#select-list::-webkit-scrollbar-thumb:hover {
+    background-color: #6E6E6E;
+}
+
+#select-list::-webkit-scrollbar {
+    width: 1.1rem;
 }
 </style>
