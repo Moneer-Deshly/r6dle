@@ -1,15 +1,44 @@
 <script>
-import r6operators, { alibi, doc, getSVGIcon } from "r6operators"
+import r6operators, { alibi, doc, getSVGIcon, recruit_blue, recruit_green, recruit_orange, recruit_red, recruit_yellow } from "r6operators"
 
 let found = true
 
-let inputField
-
 let matches = []
 
+let inputField
+
+/**
+ * Returns all the operators in an object.
+ */
 let rawOperators = Object.entries(r6operators).map(element => {  
     return element[1]
 });
+
+let rawOperatorsList = []
+
+/**
+ * Makes a list of all the operators.
+ */
+let rawOperatorsListMaker = Object.entries(rawOperators).forEach(element => {
+    rawOperatorsList.push(element[1]);
+})
+
+/**
+ * Removes other recruit versions.
+*/
+rawOperatorsList = rawOperatorsList.filter(element => {
+    return element.id != "recruit_green" && element.id != "recruit_orange" && element.id != "recruit_yellow" && element.id != "recruit_red";
+})
+
+function getRandomOp() {
+    let random = Math.floor(Math.random() * rawOperatorsList.length);
+    return rawOperatorsList[random];
+}
+
+let todaysOperator = getRandomOp();
+
+// FOR TESTING, REMOVE WHEN DONE
+console.log(todaysOperator)
 
 function autofill() {
     found = true
@@ -18,9 +47,9 @@ function autofill() {
     if (userInput.length === 0) {
         return
     }
-    for (let i = 0; i < rawOperators.length; i++) {
-        if (rawOperators[i].name.toLowerCase().startsWith(userInput, 0)) {
-            matches.push(rawOperators[i])
+    for (let i = 0; i < rawOperatorsList.length; i++) {
+        if (rawOperatorsList[i].id.startsWith(userInput, 0)) {
+            matches.push(rawOperatorsList[i])
         }
     }
     if (matches.length === 0) {
@@ -29,7 +58,12 @@ function autofill() {
 }
 
 function guess() {
-    console.log(`You have guessed ${inputField.value}!`)
+    if (inputField.value.toLowerCase() === todaysOperator.id) {
+        console.log(`You have correctly guessed ${inputField.value}!`);
+    }
+    else {
+        console.log("You guessed wrong!")
+    }
 }
 
 function selectOption(optionName) {
