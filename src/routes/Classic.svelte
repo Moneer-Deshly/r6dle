@@ -72,7 +72,7 @@ function selectOption(optionName) {
 }
 </script>
 
-<main>
+<div class = "classic-container">
     <div class = "informat">
         <h1>Guess today's operator!</h1>
         <p>Begin by typing the name of any operator.</p>
@@ -98,9 +98,35 @@ function selectOption(optionName) {
         </div>
         {/if}
     </div>
-</main>
+    <div class = "description-container">
+        <div>Operator</div>
+        <div>Gender</div>
+        <div>Role</div>
+        <div>Org</div>
+        <div>Birthplace</div>
+        <div>Health</div>
+        <div>Speed</div>
+        <div>Season</div>
+    </div>
+</div>
 
 <style>
+.classic-container{
+    display: grid;
+    place-items: center;
+    gap: 1rem;
+}
+
+.description-container{
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.2rem;
+}
+
+.description-container > * {
+    margin: 0 10px;
+}
+
 .informat {
     font-size: 1rem;
     width: max-content;
@@ -118,6 +144,8 @@ input {
     border-radius: 1rem;
     border: 1rem;
     background-color: #1a1a1a;
+    transition: border-color 0.25s;
+    box-shadow: 2px 2px 2px #0D0D0D;
 }
 
 .game {

@@ -35,13 +35,13 @@ a {
     line-height: 1.1;
     margin-bottom: 1rem;
     text-shadow: 2px 2px 2px black;
+    position: absolute;
+    top: 0;
 }
 
 .routes {
-  flex-grow: 1;
   display: grid;
   place-items: center;
-  margin-bottom: 12rem;
 }
 
 main {
