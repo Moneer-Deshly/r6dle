@@ -1,11 +1,11 @@
 <script>
-import r6operators, { alibi, doc, getSVGIcon, recruit_blue, recruit_green, recruit_orange, recruit_red, recruit_yellow } from "r6operators"
+import r6operators, { alibi, doc, getSVGIcon, recruit_blue, recruit_green, recruit_orange, recruit_red, recruit_yellow } from "r6operators";
 
-let found = true
-
-let matches = []
-
-let inputField
+let found = true;
+let matches = [];
+let inputField;
+let guessedOnce = false;
+let guessedOperator;
 
 /**
  * Returns all the operators in an object.
@@ -58,17 +58,30 @@ function autofill() {
 }
 
 function guess() {
-    if (inputField.value.toLowerCase() === todaysOperator.id) {
-        console.log(`You have correctly guessed ${inputField.value}!`);
-    }
-    else {
-        console.log("You guessed wrong!")
+    guessedOnce = true;
+    guessedOperator = rawOperatorsList.find(element => {return inputField.value.toLowerCase() === element.name.toLowerCase()});
+    const sameName = guessedOperator.name.toLowerCase() === todaysOperator.name.toLowerCase();
+    const sameGender = guessedOperator.meta.gender.toUpperCase() === todaysOperator.meta.gender.toUpperCase();
+    const sameRole = guessedOperator.role === todaysOperator.role;
+    const sameOrg = guessedOperator.org === todaysOperator.org;
+    const sameBirthplace = guessedOperator.bio.birthplace === todaysOperator.bio.birthplace;
+    const sameHealth = guessedOperator.ratings.health === todaysOperator.ratings.health;
+    const sameSpeed = guessedOperator.ratings.speed === todaysOperator.ratings.speed;
+    const sameSeason = guessedOperator.meta.season === todaysOperator.meta.season;
+
+    if (sameName) {
+        console.log(`You have correctly guessed ${todaysOperator.name}!`);
     }
 }
 
 function selectOption(optionName) {
     inputField.value = optionName;
     guess();
+}
+
+function parseCountry(operator) {
+    const array = operator.bio.birthplace.split(",");
+    return array[array.length - 1]
 }
 </script>
 
@@ -98,16 +111,38 @@ function selectOption(optionName) {
         </div>
         {/if}
     </div>
-    <div class = "description-container">
-        <div>Operator</div>
-        <div>Gender</div>
-        <div>Role</div>
-        <div>Org</div>
-        <div>Birthplace</div>
-        <div>Health</div>
-        <div>Speed</div>
-        <div>Season</div>
+    {#if guessedOnce}
+    <div class="game-container">
+        <div class = "description-container">
+            <div>Operator</div>
+            <div>Gender</div>
+            <div>Role</div>
+            <div>Org</div>
+            <div>Country</div>
+            <div>Health</div>
+            <div>Speed</div>
+            <div>Season</div>
+        </div>
+        <div class="operator-description-container">
+            <img class="guessedOperator-image" src="opicons/{guessedOperator.id}.svg/" alt="">
+            <div class="guessedOperator-gender">
+                {#if (guessedOperator.meta.gender.toUpperCase() === "M")}
+                    Male
+                {:else if (guessedOperator.meta.gender.toUpperCase() === "F")}
+                    Female
+                {:else}
+                    Other
+                {/if}
+            </div>
+            <div class="guessedOperator-role">{guessedOperator.role}</div>
+            <div class="guessedOperator-org">{guessedOperator.org}</div>
+            <div class="guessedOperator-birthplace">{parseCountry(guessedOperator)}</div>
+            <div class="guessedOperator-health">{guessedOperator.ratings.health}</div>
+            <div class="guessedOperator-speed">{guessedOperator.ratings.speed}</div>
+            <div class="guessedOperator-season">{guessedOperator.meta.season}</div>
+        </div>
     </div>
+    {/if}
 </div>
 
 <style>
@@ -117,14 +152,21 @@ function selectOption(optionName) {
     gap: 1rem;
 }
 
-.description-container{
-    display: flex;
-    justify-content: space-between;
-    font-size: 1.2rem;
+.guessedOperator-image{
+    width: 5rem;
+    height: 5rem;
 }
 
-.description-container > * {
-    margin: 0 10px;
+.game-container > div{
+    font-size: 1.2rem;
+    display: grid;
+    place-items: center;
+    grid-template-columns: repeat(8, minmax(0, 140px));
+}
+
+.description-container, .operator-description-container > *{
+    width: 100%;
+    text-align: center;
 }
 
 .informat {
@@ -192,7 +234,7 @@ input {
     display: none;
 }
 
-img {
+.operator-image{
     width: 40px;
     height: 40px;
 }
