@@ -1,11 +1,22 @@
 <script>
+// @ts-nocheck
+
 import r6operators, { alibi, doc, getSVGIcon, recruit_blue, recruit_green, recruit_orange, recruit_red, recruit_yellow } from "r6operators";
+  import { parse } from "svelte/compiler";
 
 let found = true;
 let matches = [];
 let inputField;
 let guessedOnce = false;
 let guessedOperator;
+let sameGender;
+let sameRole;
+let sameOrg;
+let sameCountry;
+let sameHealth;
+let sameSpeed;
+let sameSeason;
+let hide = false;
 
 /**
  * Returns all the operators in an object.
@@ -27,7 +38,7 @@ let rawOperatorsListMaker = Object.entries(rawOperators).forEach(element => {
  * Removes other recruit versions.
 */
 rawOperatorsList = rawOperatorsList.filter(element => {
-    return element.id != "recruit_green" && element.id != "recruit_orange" && element.id != "recruit_yellow" && element.id != "recruit_red";
+    return element.id != "recruit_green" && element.id != "recruit_orange" && element.id != "recruit_yellow" && element.id != "recruit_red" && element.id != "recruit_blue";
 })
 
 function getRandomOp() {
@@ -58,16 +69,17 @@ function autofill() {
 }
 
 function guess() {
+    hide = true;
     guessedOnce = true;
     guessedOperator = rawOperatorsList.find(element => {return inputField.value.toLowerCase() === element.name.toLowerCase()});
-    const sameName = guessedOperator.name.toLowerCase() === todaysOperator.name.toLowerCase();
-    const sameGender = guessedOperator.meta.gender.toUpperCase() === todaysOperator.meta.gender.toUpperCase();
-    const sameRole = guessedOperator.role === todaysOperator.role;
-    const sameOrg = guessedOperator.org === todaysOperator.org;
-    const sameBirthplace = guessedOperator.bio.birthplace === todaysOperator.bio.birthplace;
-    const sameHealth = guessedOperator.ratings.health === todaysOperator.ratings.health;
-    const sameSpeed = guessedOperator.ratings.speed === todaysOperator.ratings.speed;
-    const sameSeason = guessedOperator.meta.season === todaysOperator.meta.season;
+    let sameName = guessedOperator.name.toLowerCase() === todaysOperator.name.toLowerCase();
+    sameGender = guessedOperator.meta.gender.toUpperCase() === todaysOperator.meta.gender.toUpperCase();
+    sameRole = guessedOperator.role === todaysOperator.role;
+    sameOrg = guessedOperator.org === todaysOperator.org;
+    sameCountry = parseCountry(guessedOperator) === parseCountry(todaysOperator);
+    sameHealth = guessedOperator.ratings.health === todaysOperator.ratings.health;
+    sameSpeed = guessedOperator.ratings.speed === todaysOperator.ratings.speed;
+    sameSeason = guessedOperator.meta.season === todaysOperator.meta.season;
 
     if (sameName) {
         console.log(`You have correctly guessed ${todaysOperator.name}!`);
@@ -80,8 +92,11 @@ function selectOption(optionName) {
 }
 
 function parseCountry(operator) {
-    const array = operator.bio.birthplace.split(",");
-    return array[array.length - 1]
+    const array = operator.bio.birthplace.split(", ");
+    if ((array[array.length - 1]) === "Nederlands") {
+        array[array.length - 1] = "Netherlands";
+    }
+    return array[array.length - 1];
 }
 </script>
 
@@ -93,9 +108,7 @@ function parseCountry(operator) {
     <div class = "game">
         <input on:input={autofill} bind:this={inputField} placeholder="Type operator name..."/>
         <button on:click={guess} class = "submit"><i class="fa-solid fa-arrow-right fa"></i></button>
-    </div>
-    <div class = "dropdown">
-        <div id = "select-list" class={matches.length > 0 ? '' : 'hidden'}>
+        <div id = "select-list" class={matches.length > 0 && !hide ? '' : 'hidden'}>
             {#each matches as option}
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -105,12 +118,14 @@ function parseCountry(operator) {
                 </div>
             {/each}
         </div>
-        {#if (!found)}
-        <div>
-            No operators found.
-        </div>
-        {/if}
     </div>
+    
+    {#if (!found)}
+    <div>
+        No operators found.
+    </div>
+    {/if}
+    <div class="hidden">{hide = false}</div>
     {#if guessedOnce}
     <div class="game-container">
         <div class = "description-container">
@@ -124,8 +139,9 @@ function parseCountry(operator) {
             <div>Season</div>
         </div>
         <div class="operator-description-container">
-            <img class="guessedOperator-image" src="opicons/{guessedOperator.id}.svg/" alt="">
-            <div class="guessedOperator-gender">
+            <div class="square-image"><img class="guessedOperator-image" src="opicons/{guessedOperator.id}.svg/" alt=""></div>
+            <div class="square-gender" class:correct={sameGender} class:wrong={!sameGender}>
+                <div class="guessedOperator-gender">
                 {#if (guessedOperator.meta.gender.toUpperCase() === "M")}
                     Male
                 {:else if (guessedOperator.meta.gender.toUpperCase() === "F")}
@@ -133,13 +149,14 @@ function parseCountry(operator) {
                 {:else}
                     Other
                 {/if}
+                </div>
             </div>
-            <div class="guessedOperator-role">{guessedOperator.role}</div>
-            <div class="guessedOperator-org">{guessedOperator.org}</div>
-            <div class="guessedOperator-birthplace">{parseCountry(guessedOperator)}</div>
-            <div class="guessedOperator-health">{guessedOperator.ratings.health}</div>
-            <div class="guessedOperator-speed">{guessedOperator.ratings.speed}</div>
-            <div class="guessedOperator-season">{guessedOperator.meta.season}</div>
+            <div class="square-role" class:correct={sameRole} class:wrong={!sameRole}><div class="guessedOperator-role">{guessedOperator.role}</div></div>
+            <div class="square-org" class:correct={sameOrg} class:wrong={!sameOrg}><div class="guessedOperator-org">{guessedOperator.org}</div></div>
+            <div class="square-country" class:correct={sameCountry} class:wrong={!sameCountry}><div class="guessedOperator-country">{parseCountry(guessedOperator)}</div></div>
+            <div class="square-health" class:correct={sameHealth} class:wrong={!sameHealth}><div class="guessedOperator-health">{guessedOperator.ratings.health}</div></div>
+            <div class="square-speed" class:correct={sameSpeed} class:wrong={!sameSpeed}><div class="guessedOperator-speed">{guessedOperator.ratings.speed}</div></div>
+            <div class="square-season" class:correct={sameSeason} class:wrong={!sameSeason}><div class="guessedOperator-season">{guessedOperator.meta.season}</div></div>
         </div>
     </div>
     {/if}
@@ -164,9 +181,30 @@ function parseCountry(operator) {
     grid-template-columns: repeat(8, minmax(0, 140px));
 }
 
+.correct{
+    background-color: green;
+}
+
+.wrong{
+    background-color: #8c0b0b;
+}
+
 .description-container, .operator-description-container > *{
     width: 100%;
     text-align: center;
+}
+
+[class^="square-"]:not(.square-image) {
+    width: 97.5%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    cursor: default;
+    text-shadow: 0 0 3px #000;
+    box-shadow: inset 0 0 6px #ffffff;
+    border-radius: 8px;
 }
 
 .informat {
@@ -194,6 +232,7 @@ input {
     display: flex;
     align-items: center;
     gap: 0.4em;
+    position: relative;
 }
 
 .submit {
@@ -221,13 +260,15 @@ input {
 #select-list {
     max-height: 16.5rem;
     width: 22rem;
-    position: fixed;
+    position: absolute;
     margin-top: 0.2em;
     background-color: #1a1a1a; 
     padding: 0.5rem; 
     border-radius: 16px; 
     box-sizing: border-box;
     overflow-y: auto;
+    left: 0;
+    top: 70px;
 }
 
 .hidden {
