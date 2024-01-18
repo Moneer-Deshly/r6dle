@@ -2,7 +2,6 @@
 // @ts-nocheck
 
 import r6operators, { alibi, doc, getSVGIcon, recruit_blue, recruit_green, recruit_orange, recruit_red, recruit_yellow } from "r6operators";
-  import { parse } from "svelte/compiler";
 
 let found = true;
 let matches = [];
@@ -17,6 +16,7 @@ let sameHealth;
 let sameSpeed;
 let sameSeason;
 let hide = false;
+let allGuesses = [];
 
 /**
  * Returns all the operators in an object.
@@ -32,14 +32,14 @@ let rawOperatorsList = []
  */
 let rawOperatorsListMaker = Object.entries(rawOperators).forEach(element => {
     rawOperatorsList.push(element[1]);
-})
+});
 
 /**
  * Removes other recruit versions.
 */
 rawOperatorsList = rawOperatorsList.filter(element => {
     return element.id != "recruit_green" && element.id != "recruit_orange" && element.id != "recruit_yellow" && element.id != "recruit_red" && element.id != "recruit_blue";
-})
+});
 
 function getRandomOp() {
     let random = Math.floor(Math.random() * rawOperatorsList.length);
@@ -84,11 +84,31 @@ function guess() {
     if (sameName) {
         console.log(`You have correctly guessed ${todaysOperator.name}!`);
     }
+
+    allGuesses = [...allGuesses, {
+        guessedOperator: guessedOperator,
+        sameGender: sameGender,
+        sameRole: sameRole,
+        sameOrg: sameOrg,
+        sameCountry: sameCountry,
+        sameHealth: sameHealth,
+        sameSpeed: sameSpeed,
+        sameSeason: sameSeason
+    }];
+
+    removeOperator(guessedOperator.id);
+    inputField.value = "";
 }
 
 function selectOption(optionName) {
     inputField.value = optionName;
     guess();
+}
+
+function removeOperator(operator) {
+    rawOperatorsList = rawOperatorsList.filter(element => {
+        return element.id != `${operator}`;
+    });
 }
 
 function parseCountry(operator) {
@@ -128,7 +148,7 @@ function parseCountry(operator) {
     <div class="hidden">{hide = false}</div>
     {#if guessedOnce}
     <div class="game-container">
-        <div class = "description-container">
+        <div class="description-container">
             <div>Operator</div>
             <div>Gender</div>
             <div>Role</div>
@@ -138,26 +158,28 @@ function parseCountry(operator) {
             <div>Speed</div>
             <div>Season</div>
         </div>
-        <div class="operator-description-container">
-            <div class="square-image"><img class="guessedOperator-image" src="opicons/{guessedOperator.id}.svg/" alt=""></div>
-            <div class="square-gender" class:correct={sameGender} class:wrong={!sameGender}>
-                <div class="guessedOperator-gender">
-                {#if (guessedOperator.meta.gender.toUpperCase() === "M")}
-                    Male
-                {:else if (guessedOperator.meta.gender.toUpperCase() === "F")}
-                    Female
-                {:else}
-                    Other
-                {/if}
+        {#each allGuesses.reverse() as guess}
+            <div class="operator-description-container">
+                <div class="square-image"><img class="guessedOperator-image" src="opicons/{guess.guessedOperator.id}.svg/" alt=""></div>
+                <div class="square-gender" class:correct={guess.sameGender} class:wrong={!guess.sameGender}>
+                    <div class="guessedOperator-gender">
+                        {#if guess.guessedOperator.meta.gender.toUpperCase() === "M"}
+                            Male
+                        {:else if guess.guessedOperator.meta.gender.toUpperCase() === "F"}
+                            Female
+                        {:else}
+                            Other
+                        {/if}
+                    </div>
                 </div>
+                <div class="square-role" class:correct={guess.sameRole} class:wrong={!guess.sameRole}><div class="guessedOperator-role">{guess.guessedOperator.role}</div></div>
+                <div class="square-org" class:correct={guess.sameOrg} class:wrong={!guess.sameOrg}><div class="guessedOperator-org">{guess.guessedOperator.org}</div></div>
+                <div class="square-country" class:correct={guess.sameCountry} class:wrong={!guess.sameCountry}><div class="guessedOperator-country">{parseCountry(guess.guessedOperator)}</div></div>
+                <div class="square-health" class:correct={guess.sameHealth} class:wrong={!guess.sameHealth}><div class="guessedOperator-health">{guess.guessedOperator.ratings.health}</div></div>
+                <div class="square-speed" class:correct={guess.sameSpeed} class:wrong={!guess.sameSpeed}><div class="guessedOperator-speed">{guess.guessedOperator.ratings.speed}</div></div>
+                <div class="square-season" class:correct={guess.sameSeason} class:wrong={!guess.sameSeason}><div class="guessedOperator-season">{guess.guessedOperator.meta.season}</div></div>
             </div>
-            <div class="square-role" class:correct={sameRole} class:wrong={!sameRole}><div class="guessedOperator-role">{guessedOperator.role}</div></div>
-            <div class="square-org" class:correct={sameOrg} class:wrong={!sameOrg}><div class="guessedOperator-org">{guessedOperator.org}</div></div>
-            <div class="square-country" class:correct={sameCountry} class:wrong={!sameCountry}><div class="guessedOperator-country">{parseCountry(guessedOperator)}</div></div>
-            <div class="square-health" class:correct={sameHealth} class:wrong={!sameHealth}><div class="guessedOperator-health">{guessedOperator.ratings.health}</div></div>
-            <div class="square-speed" class:correct={sameSpeed} class:wrong={!sameSpeed}><div class="guessedOperator-speed">{guessedOperator.ratings.speed}</div></div>
-            <div class="square-season" class:correct={sameSeason} class:wrong={!sameSeason}><div class="guessedOperator-season">{guessedOperator.meta.season}</div></div>
-        </div>
+        {/each}
     </div>
     {/if}
 </div>
@@ -189,6 +211,10 @@ function parseCountry(operator) {
     background-color: #8c0b0b;
 }
 
+.operator-description-container{
+    margin-bottom: 0.5rem;
+}
+
 .description-container, .operator-description-container > *{
     width: 100%;
     text-align: center;
@@ -208,7 +234,7 @@ function parseCountry(operator) {
 }
 
 .informat {
-    font-size: 1rem;
+    position: fixed;
     width: max-content;
     height: max-content;
     display: flex;
@@ -216,6 +242,21 @@ function parseCountry(operator) {
     justify-content: center;
     align-items: center;
     margin-bottom: 1rem;
+    top: 15rem;
+}
+
+.game-container {
+    margin-top: 26rem;
+    overflow-y: auto;
+    height: calc(100vh - 26rem);
+}
+
+.game {
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+    position: fixed;
+    top: 20.5rem;
 }
 
 input {
@@ -226,13 +267,6 @@ input {
     background-color: #1a1a1a;
     transition: border-color 0.25s;
     box-shadow: 2px 2px 2px #0D0D0D;
-}
-
-.game {
-    display: flex;
-    align-items: center;
-    gap: 0.4em;
-    position: relative;
 }
 
 .submit {

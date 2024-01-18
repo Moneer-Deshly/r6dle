@@ -1,3 +1,0 @@
-PRIORITY LISTED BY HIGHEST PRIORITY FIRST:
-
-* Change autofill functionality to its own component to reuse it in different parts.
