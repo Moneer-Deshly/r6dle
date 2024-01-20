@@ -56,7 +56,7 @@ main {
 main::before {
   z-index: -1;
   content: "";
-  position: absolute;
+  position: fixed;
   top: 0px;
   right: 0px;
   bottom: 0px;

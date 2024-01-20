@@ -85,7 +85,7 @@ function guess() {
         console.log(`You have correctly guessed ${todaysOperator.name}!`);
     }
 
-    allGuesses = [...allGuesses, {
+    allGuesses = [{
         guessedOperator: guessedOperator,
         sameGender: sameGender,
         sameRole: sameRole,
@@ -94,7 +94,8 @@ function guess() {
         sameHealth: sameHealth,
         sameSpeed: sameSpeed,
         sameSeason: sameSeason
-    }];
+    }, ...allGuesses];
+
 
     removeOperator(guessedOperator.id);
     inputField.value = "";
@@ -141,7 +142,7 @@ function parseCountry(operator) {
     </div>
     
     {#if (!found)}
-    <div>
+    <div class="not-found">
         No operators found.
     </div>
     {/if}
@@ -158,7 +159,7 @@ function parseCountry(operator) {
             <div>Speed</div>
             <div>Season</div>
         </div>
-        {#each allGuesses.reverse() as guess}
+        {#each allGuesses as guess}
             <div class="operator-description-container">
                 <div class="square-image"><img class="guessedOperator-image" src="opicons/{guess.guessedOperator.id}.svg/" alt=""></div>
                 <div class="square-gender" class:correct={guess.sameGender} class:wrong={!guess.sameGender}>
@@ -179,12 +180,18 @@ function parseCountry(operator) {
                 <div class="square-speed" class:correct={guess.sameSpeed} class:wrong={!guess.sameSpeed}><div class="guessedOperator-speed">{guess.guessedOperator.ratings.speed}</div></div>
                 <div class="square-season" class:correct={guess.sameSeason} class:wrong={!guess.sameSeason}><div class="guessedOperator-season">{guess.guessedOperator.meta.season}</div></div>
             </div>
+        
         {/each}
     </div>
     {/if}
 </div>
 
 <style>
+.not-found{
+    position: sticky;
+    top: 25.4rem;
+}
+
 .classic-container{
     display: grid;
     place-items: center;
@@ -234,28 +241,26 @@ function parseCountry(operator) {
 }
 
 .informat {
-    position: fixed;
+    position: sticky;
     width: max-content;
     height: max-content;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin-bottom: 1rem;
     top: 15rem;
 }
 
 .game-container {
-    margin-top: 26rem;
-    overflow-y: auto;
-    height: calc(100vh - 26rem);
+    margin-top: 20rem;
+    height: calc(100vh - 22rem);
 }
 
 .game {
     display: flex;
     align-items: center;
     gap: 0.4em;
-    position: fixed;
+    position: sticky;
     top: 20.5rem;
 }
 
