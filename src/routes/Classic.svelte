@@ -3,6 +3,7 @@
 
 import r6operators, { alibi, doc, getSVGIcon, recruit_blue, recruit_green, recruit_orange, recruit_red, recruit_yellow } from "r6operators";
 import { fade } from "svelte/transition";
+import {flip} from "svelte/animate"
 
 let found = true;
 let matches = [];
@@ -172,31 +173,31 @@ function parseCountry(operator) {
         <div>Speed</div>
         <div>Season</div>
     </div>
-    <div class="game-container">
-            {#each allGuesses as guess}
-                <div class="operator-description-container">
-                    <div class="square-image" transition:fade={{}}><img class="guessedOperator-image" src="opicons/{guess.guessedOperator.id}.svg/" alt=""></div>
-                    <div class="square-gender" class:correct={guess.sameGender} class:wrong={!guess.sameGender}>
-                        <div class="guessedOperator-gender">
-                            {#if guess.guessedOperator.meta.gender.toUpperCase() === "M"}
-                                Male
-                            {:else if guess.guessedOperator.meta.gender.toUpperCase() === "F"}
-                                Female
-                            {:else}
-                                Other
-                            {/if}
-                        </div>
-                    </div>
-                    <div class="square-role" class:correct={guess.sameRole} class:wrong={!guess.sameRole}><div class="guessedOperator-role">{guess.guessedOperator.role}</div></div>
-                    <div class="square-org" class:correct={guess.sameOrg} class:wrong={!guess.sameOrg}><div class="guessedOperator-org">{guess.guessedOperator.org}</div></div>
-                    <div class="square-country" class:correct={guess.sameCountry} class:wrong={!guess.sameCountry}><div class="guessedOperator-country">{parseCountry(guess.guessedOperator)}</div></div>
-                    <div class="square-health" class:correct={guess.sameHealth} class:wrong={!guess.sameHealth}><div class="guessedOperator-health">{guess.guessedOperator.ratings.health}</div></div>
-                    <div class="square-speed" class:correct={guess.sameSpeed} class:wrong={!guess.sameSpeed}><div class="guessedOperator-speed">{guess.guessedOperator.ratings.speed}</div></div>
-                    <div class="square-season" class:correct={guess.sameSeason} class:wrong={!guess.sameSeason}><div class="guessedOperator-season">{guess.guessedOperator.meta.season}</div></div>
-                </div>
-            {/each}
-    </div>
     {/if}
+    <div class="game-container">
+        {#each allGuesses as guess (guess.guessedOperator.id)} 
+            <div class="operator-description-container">
+                <div class="square-image" in:fade={{ key:guess.guessedOperator.id }}><img class="guessedOperator-image" src="opicons/{guess.guessedOperator.id}.svg/" alt=""></div>
+                <div class="square-gender" in:fade={{ duration: 500, key:guess.guessedOperator.id, delay: 500 }} class:correct={guess.sameGender} class:wrong={!guess.sameGender}>
+                    <div class="guessedOperator-gender">
+                        {#if guess.guessedOperator.meta.gender.toUpperCase() === "M"}
+                            Male
+                        {:else if guess.guessedOperator.meta.gender.toUpperCase() === "F"}
+                            Female
+                        {:else}
+                            Other
+                        {/if}
+                    </div>
+                </div>
+                <div class="square-role" in:fade={{ duration: 500, key:guess.guessedOperator.id, delay: 1000 }} class:correct={guess.sameRole} class:wrong={!guess.sameRole}>{guess.guessedOperator.role}</div>
+                <div class="square-org" in:fade={{ duration: 500, key:guess.guessedOperator.id, delay: 1500 }} class:correct={guess.sameOrg} class:wrong={!guess.sameOrg}>{guess.guessedOperator.org}</div>
+                <div class="square-country" in:fade={{ duration: 500, key:guess.guessedOperator.id, delay: 2000 }} class:correct={guess.sameCountry} class:wrong={!guess.sameCountry}>{parseCountry(guess.guessedOperator)}</div>
+                <div class="square-health" in:fade={{ duration: 500, key:guess.guessedOperator.id, delay: 2500 }} class:correct={guess.sameHealth} class:wrong={!guess.sameHealth}>{guess.guessedOperator.ratings.health}</div>
+                <div class="square-speed" in:fade={{ duration: 500, key:guess.guessedOperator.id, delay: 3000 }} class:correct={guess.sameSpeed} class:wrong={!guess.sameSpeed}>{guess.guessedOperator.ratings.speed}</div>
+                <div class="square-season" in:fade={{ duration: 500, key:guess.guessedOperator.id, delay: 3500 }} class:correct={guess.sameSeason} class:wrong={!guess.sameSeason}>{guess.guessedOperator.meta.season}</div>
+            </div>
+        {/each}
+    </div>
 </div>
 
 <style>
@@ -346,6 +347,7 @@ input {
     overflow-y: auto;
     left: 0;
     top: 70px;
+    z-index: 999;
 }
 
 .hidden {
