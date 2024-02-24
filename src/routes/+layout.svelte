@@ -17,7 +17,7 @@ import "../global.css"
   }
   
   .header {
-    font-family: Coolvetica;
+      font-family: Coolvetica;
       display: flex;
       justify-content: center;
       font-size: 4em;

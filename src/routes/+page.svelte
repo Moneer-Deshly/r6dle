@@ -22,7 +22,6 @@ main {
 
 .info {
   font-size: larger;
-  margin-top: 1rem;
 }
 
 .headerhome {
