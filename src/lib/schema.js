@@ -1,6 +1,6 @@
 import { pgTable, bigint, varchar, timestamp, foreignKey, boolean, integer, serial} from "drizzle-orm/pg-core";
 
-export const operatorData = pgTable("operator_data",
+export const dailyOperatorTable = pgTable("daily_operator",
     {
         id: serial("id").primaryKey(),
         operatorName: varchar("operator_name").notNull(),
@@ -10,10 +10,17 @@ export const operatorData = pgTable("operator_data",
     }
 )
 
-export const userData = pgTable("user_data",
+export const userTable = pgTable("user",
     {
         id: serial("id").primaryKey(),
         sessionID: varchar("session_id").notNull().unique(),
         streak: integer("streak").default(0).notNull()
+    }
+)
+
+export const operatorTable = pgTable("operator",
+    {
+        id: serial("id").primaryKey(),
+        operatorName: varchar("operator_name").notNull()
     }
 )

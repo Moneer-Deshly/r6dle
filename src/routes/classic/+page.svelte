@@ -4,6 +4,8 @@
     import r6operators, { alibi, doc, getSVGIcon, recruit_blue, recruit_green, recruit_orange, recruit_red, recruit_yellow } from "r6operators";
     import { fade } from "svelte/transition";
     import {flip} from "svelte/animate"
+	import { onMount } from "svelte";
+    export let data;
     
     let found = true;
     let matches = [];
@@ -32,12 +34,12 @@
     /**
      * Makes a list of all the operators.
      */
-    let rawOperatorsListMaker = Object.entries(rawOperators).forEach(element => {
+    Object.entries(rawOperators).forEach(element => {
         rawOperatorsList.push(element[1]);
     });
     
     /**
-     * Removes other recruit versions.
+     * Removes all recruit versions.
     */
     rawOperatorsList = rawOperatorsList.filter(element => {
         return element.id != "recruit_green" && element.id != "recruit_orange" && element.id != "recruit_yellow" && element.id != "recruit_red" && element.id != "recruit_blue";
@@ -51,7 +53,9 @@
     let todaysOperator = getRandomOp();
     
     // FOR TESTING, REMOVE WHEN DONE
-    console.log(todaysOperator)
+    onMount(() => {
+        console.log(data.operator)
+    })
     
     function autofill() {
         found = true
