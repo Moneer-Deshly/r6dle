@@ -1,12 +1,12 @@
 import { dbClient } from "$lib/db"
-import { operatorData } from "$lib/schema"
 import r6operators, { alibi, doc, getSVGIcon, recruit_blue, recruit_green, recruit_orange, recruit_red, recruit_yellow } from "r6operators";
+import { operatorTable } from "../../lib/schema";
 
 
 export const load = async() => {
     
 
-    const rows = await dbClient.select().from(operatorDataTable)
+    const rows = await dbClient.select().from(operatorTable)
     console.log(rows)
     return { rows }
 }

@@ -138,7 +138,7 @@
     <div class = "classic-container">
         <div class = "informat">
             <h1>Guess today's operator!</h1>
-            <p>Begin by typing the name of any operator.</p>
+            <p>Begin by typing the name of any operator</p>
         </div>
         <div class = "game">
             <div class="game-with-no-ops-found">

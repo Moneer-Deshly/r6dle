@@ -29,6 +29,6 @@
 		"dotenv": "^16.4.5",
 		"drizzle-orm": "^0.29.4",
 		"postgres": "^3.4.3",
-		"r6operators": "^2.7.0"
+		"r6operators": "^2.8.0"
 	}
 }
