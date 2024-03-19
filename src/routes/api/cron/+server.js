@@ -1,11 +1,12 @@
 import { dailyOperatorTable } from '$lib/schema';
+import { dbClient } from '../../../lib/db';
 
 export async function GET() {
 
     try {
         console.log('Attempting to insert into daily_operator'); // Log before attempting to insert
 
-        const insertResult = await dailyOperatorTable.insert(dailyOperatorTable).values({
+        await dbClient.insert(dailyOperatorTable).values({
             // Provide the values for the new row
                 operatorName: "ash",
                 // You can add other fields as necessary
