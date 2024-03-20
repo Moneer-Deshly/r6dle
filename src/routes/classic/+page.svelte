@@ -45,7 +45,7 @@
         return element.id != "recruit_green" && element.id != "recruit_orange" && element.id != "recruit_yellow" && element.id != "recruit_red" && element.id != "recruit_blue";
     });
     
-    function getRandomOp() {
+    export function getRandomOp() {
         let random = Math.floor(Math.random() * rawOperatorsList.length);
         return rawOperatorsList[random];
     }

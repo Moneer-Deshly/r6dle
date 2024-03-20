@@ -17,10 +17,3 @@ export const userTable = pgTable("user",
         streak: integer("streak").default(0).notNull()
     }
 )
-
-export const operatorTable = pgTable("operator",
-    {
-        id: serial("id").primaryKey(),
-        operatorName: varchar("operator_name").notNull()
-    }
-)

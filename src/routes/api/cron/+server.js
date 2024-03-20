@@ -1,21 +1,21 @@
 import { dailyOperatorTable } from '$lib/schema';
 import { dbClient } from '../../../lib/db';
+import { getRandomOp } from "/src/routes/classic/+page.svelte"
 
 export async function GET() {
 
     try {
-        console.log('Attempting to insert into daily_operator'); // Log before attempting to insert
+        await dbClient.delete(dailyOperatorTable);
+
+        const todaysOperator = getRandomOp();
 
         await dbClient.insert(dailyOperatorTable).values({
-            // Provide the values for the new row
-                operatorName: "ash",
-                // You can add other fields as necessary
+                operatorName: todaysOperator.id
         });
 
         return new Response('Hello Cron!');
     } catch (error) {
-        console.error('Error executing cron job:', error); // Log any errors
+        console.error('Error executing cron job:', error);
         return new Response('Cron job failed', { status: 500 });
     }
 }
-// TEST TEST ALO ALO TEST
