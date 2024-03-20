@@ -2,6 +2,7 @@
     // @ts-nocheck
     import { fade } from "svelte/transition";
     import { getRandomOp } from "$lib/helpers"
+    export let data;
     
     let found = true;
     let matches = [];
@@ -20,7 +21,7 @@
     
     
     
-    let todaysOperator = getRandomOp();
+    let todaysOperator = data.name;
     
     function autofill() {
         found = true
