@@ -1,10 +1,6 @@
 <script>
     // @ts-nocheck
-    
-    import r6operators, { alibi, doc, getSVGIcon, recruit_blue, recruit_green, recruit_orange, recruit_red, recruit_yellow } from "r6operators";
     import { fade } from "svelte/transition";
-    import {flip} from "svelte/animate"
-	import { onMount } from "svelte";
     import { getRandomOp } from "$lib/helpers"
     
     let found = true;

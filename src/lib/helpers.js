@@ -1,3 +1,5 @@
+import r6operators from "r6operators";
+
 /**
      * Returns all the operators in an object.
      */
