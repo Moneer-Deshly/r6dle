@@ -1,7 +1,8 @@
 <script>
     // @ts-nocheck
     import { fade } from "svelte/transition";
-    import { getRandomOp } from "$lib/helpers"
+    import { getCleanList, removeOperator } from "$lib/helpers"
+    import { onMount } from "svelte";
     export let data;
     
     let found = true;
@@ -18,11 +19,18 @@
     let sameSeason;
     let hide = false;
     let allGuesses = [];
+    let todaysOperator;
+    let rawOperatorsList;
     
-    
-    
-    let todaysOperator = data.name;
-    
+    onMount(() => {
+        rawOperatorsList = getCleanList();
+        todaysOperator = findTodaysOperator();
+    });
+
+    function findTodaysOperator(){
+        return rawOperatorsList.find(element => data.name === element.id.toLowerCase());
+    }
+
     function autofill() {
         found = true
         let userInput = inputField.value.toLowerCase()
@@ -51,7 +59,7 @@
     function guess() {
         hide = true;
         guessedOnce = true;
-        guessedOperator = rawOperatorsList.find(element => {return inputField.value.toLowerCase() === element.id.toLowerCase()});
+        guessedOperator = rawOperatorsList.find(element =>  inputField.value.toLowerCase() === element.id.toLowerCase());
         let sameID = guessedOperator.id.toLowerCase() === todaysOperator.id.toLowerCase();
         sameGender = guessedOperator.meta.gender.toUpperCase() === todaysOperator.meta.gender.toUpperCase();
         sameRole = guessedOperator.role === todaysOperator.role;
@@ -86,11 +94,6 @@
         guess();
     }
     
-    function removeOperator(operator) {
-        rawOperatorsList = rawOperatorsList.filter(element => {
-            return element.id != `${operator}`;
-        });
-    }
     
     function parseCountry(operator) {
         const array = operator.bio.birthplace.split(", ");
