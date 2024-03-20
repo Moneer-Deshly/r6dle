@@ -1,6 +1,6 @@
 import { dailyOperatorTable } from '$lib/schema';
 import { dbClient } from '../../../lib/db';
-import { getRandomOp } from "/src/routes/classic/+page.svelte"
+import { getRandomOp } from "$lib/helpers"
 
 export async function GET() {
 
