@@ -2,12 +2,14 @@
     // @ts-nocheck
     import { fade } from "svelte/transition";
     import { getCleanList, removeOperator } from "$lib/helpers"
+    import { invalidateAll } from '$app/navigation'
     import { onMount } from "svelte";
     export let data;
     
     let found = true;
     let matches = [];
     let inputField;
+    let buttonField;
     let guessedOnce = false;
     let guessedOperator;
     let sameGender;
@@ -21,10 +23,12 @@
     let allGuesses = [];
     let todaysOperator;
     let rawOperatorsList;
+    let amountOfGuessers;
     
     onMount(() => {
         rawOperatorsList = getCleanList();
         todaysOperator = findTodaysOperator();
+        amountOfGuessers = data.guessers;
     });
 
     function findTodaysOperator(){
@@ -57,36 +61,56 @@
     }
     
     function guess() {
-        hide = true;
-        guessedOnce = true;
-        guessedOperator = rawOperatorsList.find(element =>  inputField.value.toLowerCase() === element.id.toLowerCase());
-        let sameID = guessedOperator.id.toLowerCase() === todaysOperator.id.toLowerCase();
-        sameGender = guessedOperator.meta.gender.toUpperCase() === todaysOperator.meta.gender.toUpperCase();
-        sameRole = guessedOperator.role === todaysOperator.role;
-        sameOrg = guessedOperator.org === todaysOperator.org;
-        sameCountry = parseCountry(guessedOperator) === parseCountry(todaysOperator);
-        sameHealth = guessedOperator.ratings.health === todaysOperator.ratings.health;
-        sameSpeed = guessedOperator.ratings.speed === todaysOperator.ratings.speed;
-        sameSeason = guessedOperator.meta.season === todaysOperator.meta.season;
-    
-        if (sameID) {
-            console.log(`You have correctly guessed ${todaysOperator.name}!`);
+        try {
+            hide = true;
+            guessedOnce = true;
+            guessedOperator = rawOperatorsList.find(element =>  inputField.value.toLowerCase() === element.id.toLowerCase());
+            let sameID = guessedOperator.id.toLowerCase() === todaysOperator.id.toLowerCase();
+            sameGender = guessedOperator.meta.gender.toUpperCase() === todaysOperator.meta.gender.toUpperCase();
+            sameRole = guessedOperator.role === todaysOperator.role;
+            sameOrg = guessedOperator.org === todaysOperator.org;
+            sameCountry = parseCountry(guessedOperator) === parseCountry(todaysOperator);
+            sameHealth = guessedOperator.ratings.health === todaysOperator.ratings.health;
+            sameSpeed = guessedOperator.ratings.speed === todaysOperator.ratings.speed;
+            sameSeason = guessedOperator.meta.season === todaysOperator.meta.season;
+        
+            allGuesses = [{
+                guessedOperator: guessedOperator,
+                sameGender: sameGender,
+                sameRole: sameRole,
+                sameOrg: sameOrg,
+                sameCountry: sameCountry,
+                sameHealth: sameHealth,
+                sameSpeed: sameSpeed,
+                sameSeason: sameSeason
+            }, ...allGuesses];
+        
+            if (sameID) {
+                incrementGuessers();
+                inputField.disabled = true;
+                buttonField.disabled = true;
+                console.log(`You have correctly guessed ${todaysOperator.name}!`);
+            }
+        
+            removeOperator(guessedOperator.id);
+            inputField.value = "";
         }
-    
-        allGuesses = [{
-            guessedOperator: guessedOperator,
-            sameGender: sameGender,
-            sameRole: sameRole,
-            sameOrg: sameOrg,
-            sameCountry: sameCountry,
-            sameHealth: sameHealth,
-            sameSpeed: sameSpeed,
-            sameSeason: sameSeason
-        }, ...allGuesses];
-    
-    
-        removeOperator(guessedOperator.id);
-        inputField.value = "";
+        
+        catch(error) {
+            inputField.value = "";
+        }
+    }
+
+    async function incrementGuessers(){
+
+        const req = await fetch("/api/submitGuess", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"}
+        })
+
+        const res = await req.json()
+
+        invalidateAll()
     }
     
     function selectOption(optionName) {
@@ -108,12 +132,15 @@
         <div class = "informat">
             <h1>Guess today's operator!</h1>
             <p>Begin by typing the name of any operator</p>
+            {#if data.guessers}
+                <p>{data.guessers} have guessed correctly so far!</p>
+            {/if}
         </div>
         <div class = "game">
             <div class="game-with-no-ops-found">
                 <div class="pure-game">
                     <input on:input={autofill} bind:this={inputField} placeholder="Type operator name..." tabindex="0" on:keyup={handleSubmitByEnter}/>
-                    <button on:click={guess} class = "submit"><i class="fa-solid fa-arrow-right fa"></i></button>
+                    <button on:click={guess} bind:this={buttonField} class = "submit"><i class="fa-solid fa-arrow-right fa"></i></button>
                 </div>
                 {#if (!found)}
                     <div class="not-found">
@@ -135,7 +162,7 @@
             </div>
         </div>
         <div class="hidden">{hide = false}</div>
-        {#if guessedOnce}
+        {#if allGuesses.length > 0}
         <div class="description-container">
             <div>Operator</div>
             <div>Gender</div>
@@ -349,5 +376,10 @@
     
     #select-list::-webkit-scrollbar, .game-container::-webkit-scrollbar {
         width: 1.1rem;
+    }
+
+    .submit:disabled{
+        cursor: default;
+        border: none;
     }
     </style>

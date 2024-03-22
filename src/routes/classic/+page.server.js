@@ -4,10 +4,11 @@ import { dailyOperatorTable } from '$lib/schema';
 export async function load() {
 
     try {
-        const result = await dbClient.select({name: dailyOperatorTable.operatorName}).from(dailyOperatorTable);
+        const result = await dbClient.select({name: dailyOperatorTable.operatorName, guessers: dailyOperatorTable.guessers}).from(dailyOperatorTable);
 
         return {
-            name: result[0].name
+            name: result[0].name,
+            guessers: result[0].guessers
         }
     
     } catch (error) {
