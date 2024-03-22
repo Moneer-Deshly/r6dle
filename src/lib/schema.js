@@ -5,7 +5,7 @@ export const dailyOperatorTable = pgTable("daily_operator",
         id: serial("id").primaryKey(),
         operatorName: varchar("operator_name").notNull(),
         guessers: integer("guessers").default(0).notNull(),
-        averageNumGuesses: integer("average_numb_guesses").default(0).notNull()
+        allGuesses: integer("all_guesses").default(0).notNull()
     }
 )
 

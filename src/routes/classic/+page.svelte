@@ -1,7 +1,7 @@
 <script>
     // @ts-nocheck
     import { fade } from "svelte/transition";
-    import { getCleanList, removeOperator } from "$lib/helpers"
+    import { getCleanList } from "$lib/helpers"
     import { invalidateAll } from '$app/navigation'
     import { onMount } from "svelte";
     export let data;
@@ -10,7 +10,6 @@
     let matches = [];
     let inputField;
     let buttonField;
-    let guessedOnce = false;
     let guessedOperator;
     let sameGender;
     let sameRole;
@@ -23,13 +22,16 @@
     let allGuesses = [];
     let todaysOperator;
     let rawOperatorsList;
-    let amountOfGuessers;
+    let avgGuesses;
     
     onMount(() => {
         rawOperatorsList = getCleanList();
         todaysOperator = findTodaysOperator();
-        amountOfGuessers = data.guessers;
     });
+
+    function showAvgGuesses(){ // USE THIS WHEN USER IS DONE WITH THE GAME!!!
+        avgGuesses = (data.allGuesses / data.guessers);
+    }
 
     function findTodaysOperator(){
         return rawOperatorsList.find(element => data.name === element.id.toLowerCase());
@@ -62,8 +64,8 @@
     
     function guess() {
         try {
+            incrementAllGuesses()
             hide = true;
-            guessedOnce = true;
             guessedOperator = rawOperatorsList.find(element =>  inputField.value.toLowerCase() === element.id.toLowerCase());
             let sameID = guessedOperator.id.toLowerCase() === todaysOperator.id.toLowerCase();
             sameGender = guessedOperator.meta.gender.toUpperCase() === todaysOperator.meta.gender.toUpperCase();
@@ -86,7 +88,7 @@
             }, ...allGuesses];
         
             if (sameID) {
-                incrementGuessers();
+                incrementCorrectGuesses();
                 inputField.disabled = true;
                 buttonField.disabled = true;
                 console.log(`You have correctly guessed ${todaysOperator.name}!`);
@@ -98,18 +100,29 @@
         
         catch(error) {
             inputField.value = "";
-            console.log(error) // FOR DEBUGGING, REMOVE LATER
         }
     }
 
-    async function incrementGuessers(){
+    function removeOperator(operatorId) {
+        rawOperatorsList = rawOperatorsList.filter(operator => operator.id !== operatorId);
+    }
 
-        const req = await fetch("/api/submitGuess", {
+    async function incrementCorrectGuesses(){
+
+        const req = await fetch("/api/submitCorrectGuess", {
             method: "POST",
             headers: {"Content-Type": "application/json"}
         })
 
-        const res = await req.json()
+        invalidateAll()
+    }
+
+    async function incrementAllGuesses(){
+
+        const req = await fetch("/api/submitGeneralGuess", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"}
+        })
 
         invalidateAll()
     }
@@ -132,7 +145,7 @@
     <div class = "classic-container">
         <div class = "informat">
             <h1>Guess today's operator!</h1>
-            <p>Begin by typing the name of any operator</p>
+            <h3>Begin by typing the name of any operator</h3>
             {#if data.guessers}
                 <p>{data.guessers} have guessed correctly so far!</p>
             {/if}

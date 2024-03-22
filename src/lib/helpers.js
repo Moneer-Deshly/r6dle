@@ -19,7 +19,3 @@ export function getRandomOp() {
     const randomIndex = Math.floor(Math.random() * operatorList.length);
     return operatorList[randomIndex];
 }
-
-export function removeOperator(operatorId) {
-    operatorList = operatorList.filter(operator => operator.id !== operatorId);
-}
