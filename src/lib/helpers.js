@@ -1,41 +1,25 @@
 import r6operators from "r6operators";
 
-/**
- * Returns all the operators in an object.
- */
-let rawOperators = Object.entries(r6operators).map(element => {  
-    return element[1]
+// Simplify the initial creation of the operators list by directly mapping and filtering in one step
+const allOperators = Object.values(r6operators).filter(operator => {
+    // Check if the operator is not one of the recruits
+    const isNotRecruit = !["recruit_green", "recruit_orange", "recruit_yellow", "recruit_red", "recruit_blue"].includes(operator.id);
+    return isNotRecruit;
 });
 
-let rawOperatorsList = []
-
+// This function now simply returns a clone of the allOperators array to ensure immutability when used outside
 export function getCleanList() {
-
-    /**
-     * Makes a list of all the operators.
-     */
-    Object.entries(rawOperators).forEach(element => {
-        rawOperatorsList.push(element[1]);
-    });
-
-    /**
-     * Removes all recruit versions.
-    */
-    rawOperatorsList = rawOperatorsList.filter(element => {
-        return element.id != "recruit_green" && element.id != "recruit_orange" && element.id != "recruit_yellow" && element.id != "recruit_red" && element.id != "recruit_blue";
-    });
-
-    
-    return rawOperatorsList;
+    return [...allOperators];
 }
+
+// Initialize the list with the non-recruit operators
+let operatorList = getCleanList();
 
 export function getRandomOp() {
-    let random = Math.floor(Math.random() * rawOperatorsList.length);
-    return rawOperatorsList[random];
+    const randomIndex = Math.floor(Math.random() * operatorList.length);
+    return operatorList[randomIndex];
 }
 
-export function removeOperator(operator) {
-    rawOperatorsList = rawOperatorsList.filter(element => {
-        return element.id != `${operator}`;
-    });
+export function removeOperator(operatorId) {
+    operatorList = operatorList.filter(operator => operator.id !== operatorId);
 }

@@ -98,6 +98,7 @@
         
         catch(error) {
             inputField.value = "";
+            console.log(error) // FOR DEBUGGING, REMOVE LATER
         }
     }
 
