@@ -4,6 +4,7 @@
     import { getCleanList } from "$lib/helpers"
     import { invalidateAll } from '$app/navigation'
     import { onMount } from "svelte";
+    import Message from "../../lib/components/Message.svelte";
     export let data;
     
     let found = true;
@@ -31,6 +32,7 @@
 
     function showAvgGuesses(){ // USE THIS WHEN USER IS DONE WITH THE GAME!!!
         avgGuesses = (data.allGuesses / data.guessers);
+        return avgGuesses;
     }
 
     function findTodaysOperator(){
@@ -146,9 +148,12 @@
         <div class = "informat">
             <h1>Guess today's operator!</h1>
             <h3>Begin by typing the name of any operator</h3>
-            {#if data.guessers}
-                <p>{data.guessers} have guessed correctly so far!</p>
-            {/if}
+            <div class="sub-informat">
+                {#if data.guessers}
+                    <p class="guessers">{data.guessers} have guessed correctly so far!</p>
+                {/if}
+                <Message/>
+            </div>
         </div>
         <div class = "game">
             <div class="game-with-no-ops-found">
@@ -214,186 +219,197 @@
         </div>
     </div>
     
-    <style>
-    .game-with-no-ops-found{
-        display: grid;
-        grid-template-columns: repeat(1, 1fr);
-        justify-items: center;
-    }
-    
-    .pure-game{
-        margin-bottom: 0.7rem;
-    }
-    
-    .not-found{
-        font-size: 1.1rem;
-        max-height: 16.5rem;
-        width: 22rem;
-        position: absolute;
-        background-color: #1a1a1a; 
-        padding: 1.25rem; 
-        border-radius: 16px; 
-        box-sizing: border-box;
-        overflow-y: auto;
-        left: 0;
-        top: 70px;
-    }
-    
-    .classic-container{
-        display: grid;
-        place-items: center;
-        gap: 1rem;
-    }
-    
-    .guessedOperator-image{
-        width: 5rem;
-        height: 5rem;
-    }
-    
-    .game-container > div{
-        font-size: 1.2rem;
-        display: grid;
-        place-items: center;
-        grid-template-columns: repeat(8, minmax(0, 140px));
-    }
-    
-    .correct{
-        background-color: green;
-    }
-    
-    .wrong{
-        background-color: #8c0b0b;
-    }
-    
-    .operator-description-container{
-        margin-bottom: 0.5rem;
-    }
-    
-    .description-container{
-        margin-bottom: 0.5rem;
-        font-size: 1.2rem;
-        display: grid;
-        place-items: center;
-        grid-template-columns: repeat(8, minmax(0, 140px));
-    }
-    
-    .description-container, .operator-description-container > *{
-        width: 100%;
-        text-align: center;
-    }
-    
-    [class^="square-"]:not(.square-image) {
-        width: 97.5%;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        text-align: center;
-        align-items: center;
-        cursor: default;
-        text-shadow: 0 0 3px #000;
-        box-shadow: inset 0 0 6px #ffffff;
-        border-radius: 8px;
-    }
-    
-    .informat {
-        margin-top: 2rem;
-        width: max-content;
-        height: max-content;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
-    
-    .game-container {
-        height: calc(100vh - 22rem);
-        overflow-x: hidden;
-        overflow-y: auto;
-    }
-    
-    .game {
-        display: flex;
-        align-items: center;
-        gap: 0.4em;
-        position: relative;
-    }
-    
-    input {
-        padding: 1.2rem;
-        font-size: 1.25em;
-        border-radius: 1rem;
-        border: 1rem;
-        background-color: #1a1a1a;
-        transition: border-color 0.25s;
-        box-shadow: 2px 2px 2px #0D0D0D;
-    }
-    
-    .submit {
-        padding: 0.75rem 0rem;
-        width: 3.75rem;
-        height: 3.75rem;
-        font-size: 1em;
-        border-radius: 50%;
-        margin-bottom: 0rem;
-    }
-    
-    .operator-container {
-        display: flex;
-        align-items: center; 
-        padding: 0.75rem;
-        border-radius: 8px;
-        cursor: pointer;
-    }
-    
-    .operator-container:hover{
-        transition: 0.1s;
-        background-color: #333333;
-    }
-    
-    #select-list {
-        max-height: 16.5rem;
-        width: 22rem;
-        position: absolute;
-        background-color: #1a1a1a; 
-        padding: 0.5rem; 
-        border-radius: 16px; 
-        box-sizing: border-box;
-        overflow-y: auto;
-        left: 0;
-        top: 70px;
-        z-index: 999;
-    }
-    
-    .hidden {
-        display: none;
-    }
-    
-    .operator-image{
-        width: 40px;
-        height: 40px;
-    }
-    
-    #select-list::-webkit-scrollbar-track, .game-container::-webkit-scrollbar-track {
-        background-color: #2e2e2e; 
-        border-radius: 10px; 
-    }
-    
-    #select-list::-webkit-scrollbar-thumb, .game-container::-webkit-scrollbar-thumb {
-        background-color: #565656; 
-        border-radius: 10px; 
-        border: 3px solid #2e2e2e; 
-    }
-    
-    #select-list::-webkit-scrollbar-thumb:hover, .game-container::-webkit-scrollbar-thumb:hover {
-        background-color: #6E6E6E;
-    }
-    
-    #select-list::-webkit-scrollbar, .game-container::-webkit-scrollbar {
-        width: 1.1rem;
-    }
+<style>
+.sub-informat{
+    display: grid;
+    justify-items: center;
+    align-items: center;
+    grid-template-columns: 3fr 1fr;
+}
 
-    .submit:disabled{
-        cursor: default;
-        border: none;
-    }
-    </style>
+.guessers{
+    margin-top: 7px;
+}
+
+.game-with-no-ops-found{
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    justify-items: center;
+}
+
+.pure-game{
+    margin-bottom: 0.7rem;
+}
+
+.not-found{
+    font-size: 1.1rem;
+    max-height: 16.5rem;
+    width: 22rem;
+    position: absolute;
+    background-color: #1a1a1a; 
+    padding: 1.25rem; 
+    border-radius: 16px; 
+    box-sizing: border-box;
+    overflow-y: auto;
+    left: 0;
+    top: 70px;
+}
+
+.classic-container{
+    display: grid;
+    place-items: center;
+    gap: 1rem;
+}
+
+.guessedOperator-image{
+    width: 5rem;
+    height: 5rem;
+}
+
+.game-container > div{
+    font-size: 1.2rem;
+    display: grid;
+    place-items: center;
+    grid-template-columns: repeat(8, minmax(0, 140px));
+}
+
+.correct{
+    background-color: green;
+}
+
+.wrong{
+    background-color: #8c0b0b;
+}
+
+.operator-description-container{
+    margin-bottom: 0.5rem;
+}
+
+.description-container{
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+    display: grid;
+    place-items: center;
+    grid-template-columns: repeat(8, minmax(0, 140px));
+}
+
+.description-container, .operator-description-container > *{
+    width: 100%;
+    text-align: center;
+}
+
+[class^="square-"]:not(.square-image) {
+    width: 97.5%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    cursor: default;
+    text-shadow: 0 0 3px #000;
+    box-shadow: inset 0 0 6px #ffffff;
+    border-radius: 8px;
+}
+
+.informat {
+    margin-top: 2rem;
+    width: max-content;
+    height: max-content;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.game-container {
+    height: calc(100vh - 22rem);
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.game {
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+    position: relative;
+}
+
+input {
+    padding: 1.2rem;
+    font-size: 1.25em;
+    border-radius: 1rem;
+    border: 1rem;
+    background-color: #1a1a1a;
+    transition: border-color 0.25s;
+    box-shadow: 2px 2px 2px #0D0D0D;
+}
+
+.submit {
+    padding: 0.75rem 0rem;
+    width: 3.75rem;
+    height: 3.75rem;
+    font-size: 1em;
+    border-radius: 50%;
+    margin-bottom: 0rem;
+}
+
+.operator-container {
+    display: flex;
+    align-items: center; 
+    padding: 0.75rem;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.operator-container:hover{
+    transition: 0.1s;
+    background-color: #333333;
+}
+
+#select-list {
+    max-height: 16.5rem;
+    width: 22rem;
+    position: absolute;
+    background-color: #1a1a1a; 
+    padding: 0.5rem; 
+    border-radius: 16px; 
+    box-sizing: border-box;
+    overflow-y: auto;
+    left: 0;
+    top: 70px;
+    z-index: 999;
+}
+
+.hidden {
+    display: none;
+}
+
+.operator-image{
+    width: 40px;
+    height: 40px;
+}
+
+#select-list::-webkit-scrollbar-track, .game-container::-webkit-scrollbar-track {
+    background-color: #2e2e2e; 
+    border-radius: 10px; 
+}
+
+#select-list::-webkit-scrollbar-thumb, .game-container::-webkit-scrollbar-thumb {
+    background-color: #565656; 
+    border-radius: 10px; 
+    border: 3px solid #2e2e2e; 
+}
+
+#select-list::-webkit-scrollbar-thumb:hover, .game-container::-webkit-scrollbar-thumb:hover {
+    background-color: #6E6E6E;
+}
+
+#select-list::-webkit-scrollbar, .game-container::-webkit-scrollbar {
+    width: 1.1rem;
+}
+
+.submit:disabled{
+    cursor: default;
+    border: none;
+}
+</style>
