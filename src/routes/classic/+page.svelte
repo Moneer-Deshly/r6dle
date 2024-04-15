@@ -30,7 +30,7 @@
         todaysOperator = findTodaysOperator();
     });
 
-    function showAvgGuesses(){ // USE THIS WHEN USER IS DONE WITH THE GAME!!!
+    function getAvgGuesses(){ // USE THIS WHEN USER IS DONE WITH THE GAME!!!
         avgGuesses = (data.allGuesses / data.guessers);
         return avgGuesses;
     }
@@ -149,9 +149,7 @@
             <h1>Guess today's operator!</h1>
             <h3>Begin by typing the name of any operator</h3>
             <div class="sub-informat">
-                {#if data.guessers}
-                    <p class="guessers">{data.guessers} have guessed correctly so far!</p>
-                {/if}
+                <p class="guessers">{data.guessers} have guessed correctly so far!</p>
                 <Message/>
             </div>
         </div>
@@ -221,6 +219,7 @@
     
 <style>
 .sub-informat{
+    position: relative;
     display: grid;
     justify-items: center;
     align-items: center;
@@ -312,7 +311,7 @@
 }
 
 .informat {
-    margin-top: 2rem;
+    margin-top: 3rem;
     width: max-content;
     height: max-content;
     display: flex;

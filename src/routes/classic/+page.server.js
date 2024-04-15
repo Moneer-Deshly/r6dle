@@ -14,7 +14,6 @@ export async function load() {
         }
     
     } catch (error) {
-        console.error('Error executing cron job:', error);
         return {}
     }
 }
