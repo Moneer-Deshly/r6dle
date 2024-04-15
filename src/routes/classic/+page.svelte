@@ -1,3 +1,5 @@
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <script>
     // @ts-nocheck
     import { fade } from "svelte/transition";
@@ -28,6 +30,7 @@
     onMount(() => {
         rawOperatorsList = getCleanList();
         todaysOperator = findTodaysOperator();
+        console.log(rawOperatorsList[0])
     });
 
     function getAvgGuesses(){ // USE THIS WHEN USER IS DONE WITH THE GAME!!!
@@ -70,7 +73,7 @@
             hide = true;
             guessedOperator = rawOperatorsList.find(element =>  inputField.value.toLowerCase() === element.id.toLowerCase());
             let sameID = guessedOperator.id.toLowerCase() === todaysOperator.id.toLowerCase();
-            sameGender = guessedOperator.meta.gender.toUpperCase() === todaysOperator.meta.gender.toUpperCase();
+            sameGender = parseGender(guessedOperator) === parseGender(todaysOperator);
             sameRole = guessedOperator.role === todaysOperator.role;
             sameOrg = guessedOperator.org === todaysOperator.org;
             sameCountry = parseCountry(guessedOperator) === parseCountry(todaysOperator);
@@ -94,6 +97,18 @@
                 inputField.disabled = true;
                 buttonField.disabled = true;
                 console.log(`You have correctly guessed ${todaysOperator.name}!`);
+                if (!localStorage.getItem("userID")) {
+                    localStorage.setItem("userID", uuidv4());
+                    localStorage.setItem("streak", 1);
+                } else {
+                    const streak = localStorage.getItem("streak");
+                    if (streak) {
+                        let streakInt = parseInt(streak);
+                        localStorage.setItem("streak", streakInt + 1);
+                    } else {
+                        localStorage.setItem("streak", 1);
+                    }
+                }
             }
         
             removeOperator(guessedOperator.id);
@@ -142,6 +157,14 @@
         }
         return array[array.length - 1];
     }
+
+    function parseGender(operator){
+        if (operator.meta.gender.toLowerCase() != 'm' && operator.meta.gender.toLowerCase() != 'f') {
+            operator.meta.gender = 'o';
+            return operator.meta.gender;
+        }
+        return operator.meta.gender;
+    }
     </script>
     
     <div class = "classic-container">
@@ -169,8 +192,6 @@
             </div>
             <div id = "select-list" class={matches.length > 0 && !hide ? '' : 'hidden'}>
                 {#each matches as option}
-                    <!-- svelte-ignore a11y-click-events-have-key-events -->
-                    <!-- svelte-ignore a11y-no-static-element-interactions -->
                     <div class="operator-container" on:click={() => selectOption(option.id.toLowerCase())}>
                         <div class="operator">{option.name}</div>
                         <img class="operator-image" src="opicons/{option.id}.svg/" alt="">

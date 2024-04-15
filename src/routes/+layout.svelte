@@ -1,6 +1,13 @@
 <script>
+	import { onMount } from "svelte";
 import "../global.css" 
+import { v4 as uuidv4 } from "uuid";
 
+onMount(() => {
+  if (!localStorage.getItem("userID")) {
+    localStorage.setItem("userID", uuidv4());
+  }
+})
 </script>
 
 <main>

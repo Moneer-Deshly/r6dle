@@ -11,8 +11,7 @@ export const dailyOperatorTable = pgTable("daily_operator",
 
 export const userTable = pgTable("user",
     {
-        id: serial("id").primaryKey(),
-        sessionID: varchar("session_id").notNull().unique(),
+        id: varchar("id").primaryKey(),
         streak: integer("streak").default(0).notNull()
     }
 )
