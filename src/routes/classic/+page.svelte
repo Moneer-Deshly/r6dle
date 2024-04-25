@@ -26,6 +26,7 @@
     let todaysOperator;
     let rawOperatorsList;
     let avgGuesses;
+    let showSuccess = false;
     
     onMount(() => {
         rawOperatorsList = getCleanList();
@@ -97,6 +98,7 @@
                 inputField.disabled = true;
                 buttonField.disabled = true;
                 console.log(`You have correctly guessed ${todaysOperator.name}!`);
+                showSuccess = true;
                 if (!localStorage.getItem("userID")) {
                     localStorage.setItem("userID", uuidv4());
                     localStorage.setItem("streak", 1);
@@ -167,78 +169,119 @@
     }
     </script>
     
-    <div class = "classic-container">
-        <div class = "informat">
-            <h1>Guess today's operator!</h1>
-            <h3>Begin by typing the name of any operator</h3>
-            <div class="sub-informat">
-                <p class="guessers">{data.guessers} have guessed correctly so far!</p>
-                <Message/>
-            </div>
+<div class = "classic-container">
+    <div class = "informat">
+        <h1>Guess today's operator!</h1>
+        <h3>Begin by typing the name of any operator</h3>
+        <div class="sub-informat">
+            <p class="guessers">{data.guessers} have guessed correctly so far!</p>
+            <Message/>
         </div>
-        <div class = "game">
-            <div class="game-with-no-ops-found">
-                <div class="pure-game">
-                    <input on:input={autofill} bind:this={inputField} placeholder="Type operator name..." tabindex="0" on:keyup={handleSubmitByEnter}/>
-                    <button on:click={guess} bind:this={buttonField} class = "submit"><i class="fa-solid fa-arrow-right fa"></i></button>
+    </div>
+    <div class = "game">
+        <div class="game-with-no-ops-found">
+            <div class="pure-game">
+                <input on:input={autofill} bind:this={inputField} placeholder="Type operator name..." tabindex="0" on:keyup={handleSubmitByEnter}/>
+                <button on:click={guess} bind:this={buttonField} class = "submit"><i class="fa-solid fa-arrow-right fa"></i></button>
+            </div>
+            {#if (!found)}
+                <div class="not-found">
+                    No operators found.
                 </div>
-                {#if (!found)}
-                    <div class="not-found">
-                        No operators found.
-                    </div>
-                {:else}
-                    <div></div>
-                {/if}
-            </div>
-            <div id = "select-list" class={matches.length > 0 && !hide ? '' : 'hidden'}>
-                {#each matches as option}
-                    <div class="operator-container" on:click={() => selectOption(option.id.toLowerCase())}>
-                        <div class="operator">{option.name}</div>
-                        <img class="operator-image" src="opicons/{option.id}.svg/" alt="">
-                    </div>
-                {/each}
-            </div>
+            {:else}
+                <div></div>
+            {/if}
         </div>
-        <div class="hidden">{hide = false}</div>
-        {#if allGuesses.length > 0}
-        <div class="description-container">
-            <div>Operator</div>
-            <div>Gender</div>
-            <div>Role</div>
-            <div>Org</div>
-            <div>Country</div>
-            <div>Health</div>
-            <div>Speed</div>
-            <div>Season</div>
-        </div>
-        {/if}
-        <div class="game-container">
-            {#each allGuesses as guess (guess.guessedOperator.id)} 
-                <div class="operator-description-container">
-                    <div class="square-image" in:fade={{ key:guess.guessedOperator.id }}><img class="guessedOperator-image" src="opicons/{guess.guessedOperator.id}.svg/" alt=""></div>
-                    <div class="square-gender" in:fade={{ duration: 500, key:guess.guessedOperator.id, delay: 500 }} class:correct={guess.sameGender} class:wrong={!guess.sameGender}>
-                        <div class="guessedOperator-gender">
-                            {#if guess.guessedOperator.meta.gender.toUpperCase() === "M"}
-                                Male
-                            {:else if guess.guessedOperator.meta.gender.toUpperCase() === "F"}
-                                Female
-                            {:else}
-                                Other
-                            {/if}
-                        </div>
-                    </div>
-                    <div class="square-role" in:fade={{ duration: 500, key:guess.guessedOperator.id, delay: 1000 }} class:correct={guess.sameRole} class:wrong={!guess.sameRole}>{guess.guessedOperator.role}</div>
-                    <div class="square-org" in:fade={{ duration: 500, key:guess.guessedOperator.id, delay: 1500 }} class:correct={guess.sameOrg} class:wrong={!guess.sameOrg}>{guess.guessedOperator.org}</div>
-                    <div class="square-country" in:fade={{ duration: 500, key:guess.guessedOperator.id, delay: 2000 }} class:correct={guess.sameCountry} class:wrong={!guess.sameCountry}>{parseCountry(guess.guessedOperator)}</div>
-                    <div class="square-health" in:fade={{ duration: 500, key:guess.guessedOperator.id, delay: 2500 }} class:correct={guess.sameHealth} class:wrong={!guess.sameHealth}>{guess.guessedOperator.ratings.health}</div>
-                    <div class="square-speed" in:fade={{ duration: 500, key:guess.guessedOperator.id, delay: 3000 }} class:correct={guess.sameSpeed} class:wrong={!guess.sameSpeed}>{guess.guessedOperator.ratings.speed}</div>
-                    <div class="square-season" in:fade={{ duration: 500, key:guess.guessedOperator.id, delay: 3500 }} class:correct={guess.sameSeason} class:wrong={!guess.sameSeason}>{guess.guessedOperator.meta.season}</div>
+        <div id = "select-list" class={matches.length > 0 && !hide ? '' : 'hidden'}>
+            {#each matches as option}
+                <div class="operator-container" on:click={() => selectOption(option.id.toLowerCase())}>
+                    <div class="operator">{option.name}</div>
+                    <img class="operator-image" src="opicons/{option.id}.svg/" alt="">
                 </div>
             {/each}
         </div>
     </div>
+    <div class="hidden">{hide = false}</div>
+    {#if allGuesses.length > 0}
+    <div class="description-container">
+        <div>Operator</div>
+        <div>Gender</div>
+        <div>Role</div>
+        <div>Org</div>
+        <div>Country</div>
+        <div>Health</div>
+        <div>Speed</div>
+        <div>Season</div>
+    </div>
+    {/if}
+    <div class="game-container">
+        {#each allGuesses as guess (guess.guessedOperator.id)} 
+            <div class="operator-description-container">
+                <div class="square-image" in:fade={{ key:guess.guessedOperator.id }}><img class="guessedOperator-image" src="opicons/{guess.guessedOperator.id}.svg/" alt=""></div>
+                <div class="square-gender" in:fade={{ duration: 500, key:guess.guessedOperator.id, delay: 500 }} class:correct={guess.sameGender} class:wrong={!guess.sameGender}>
+                    <div class="guessedOperator-gender">
+                        {#if guess.guessedOperator.meta.gender.toUpperCase() === "M"}
+                            Male
+                        {:else if guess.guessedOperator.meta.gender.toUpperCase() === "F"}
+                            Female
+                        {:else}
+                            Other
+                        {/if}
+                    </div>
+                </div>
+                <div class="square-role" in:fade={{ duration: 500, key:guess.guessedOperator.id, delay: 1000 }} class:correct={guess.sameRole} class:wrong={!guess.sameRole}>{guess.guessedOperator.role}</div>
+                <div class="square-org" in:fade={{ duration: 500, key:guess.guessedOperator.id, delay: 1500 }} class:correct={guess.sameOrg} class:wrong={!guess.sameOrg}>{guess.guessedOperator.org}</div>
+                <div class="square-country" in:fade={{ duration: 500, key:guess.guessedOperator.id, delay: 2000 }} class:correct={guess.sameCountry} class:wrong={!guess.sameCountry}>{parseCountry(guess.guessedOperator)}</div>
+                <div class="square-health" in:fade={{ duration: 500, key:guess.guessedOperator.id, delay: 2500 }} class:correct={guess.sameHealth} class:wrong={!guess.sameHealth}>{guess.guessedOperator.ratings.health}</div>
+                <div class="square-speed" in:fade={{ duration: 500, key:guess.guessedOperator.id, delay: 3000 }} class:correct={guess.sameSpeed} class:wrong={!guess.sameSpeed}>{guess.guessedOperator.ratings.speed}</div>
+                <div class="square-season" in:fade={{ duration: 500, key:guess.guessedOperator.id, delay: 3500 }} class:correct={guess.sameSeason} class:wrong={!guess.sameSeason}>{guess.guessedOperator.meta.season}</div>
+            </div>
+        {/each}
+    </div>
+    {#if showSuccess}
+    <div class="success-message" transition:fade>
+        <div class="success-content">
+        <h2>gg ez</h2>
+        <img src="opicons/{todaysOperator.id}.svg/" alt="" />
+        <p>You correctly guessed <strong>{todaysOperator.name}</strong>!</p>
+        <div>You are the {data.guessers}</div>
+        <div>It takes an average of {Math.round(getAvgGuesses())} tries to guess this operator correctly!</div>
+        </div>
+    </div>
+    {/if}
+</div>
     
 <style>
+.success-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 300px;
+    background-color: #1a1a1a;
+    color: white;
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    z-index: 10;
+  }
+
+  .success-message img {
+    margin-top: 1rem;
+    width: 100px;
+    height: 100px;
+  }
+
+  .success-message h2 {
+    color: #00ff00;
+  }
+
+  .success-message p {
+    margin: 0.5rem 0;
+  }
+
 .sub-informat{
     position: relative;
     display: grid;
