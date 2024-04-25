@@ -55,7 +55,7 @@
   height: 100vh;
   width: 100vw;
   opacity: 0.7;
-  z-index: 1;
+  z-index: 9999;
 }
 
 button{
@@ -107,6 +107,6 @@ button:hover {
   padding: 1rem;
   border-radius: 1rem;
   border: 1px solid transparent;
-  z-index: 2;
+  z-index: 9999;
 }
 </style>

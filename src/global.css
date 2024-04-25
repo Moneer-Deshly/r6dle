@@ -3,7 +3,6 @@
     padding: 0;
   }
 
-
   /* Scrollbar track */
   html::-webkit-scrollbar-track, body::-webkit-scrollbar-track {
     background-color: #2e2e2e; 
@@ -26,7 +25,14 @@
   html::-webkit-scrollbar, body::-webkit-scrollbar {
     width: 1.1rem;
   }
+
+  h1{
+    font-weight: normal;
+  }
   
+  h3{
+    font-weight: normal;
+  }
   
   :root {
     font-family: 'Rubik', sans-serif;
