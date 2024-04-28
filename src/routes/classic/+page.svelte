@@ -8,6 +8,7 @@
     import { invalidateAll } from '$app/navigation'
     import { onMount } from "svelte";
     import Message from "../../lib/components/Message.svelte";
+	import VictoryScreen from '../../lib/components/VictoryScreen.svelte';
     export let data;
     
     let found = true;
@@ -29,16 +30,25 @@
     let avgGuesses;
     let showSuccess = false;
     let userGuesses = 0;
-    
+    let gameWon;
+    let userStreak;
+
     onMount(() => {
+        if (!localStorage.getItem("streak")) {
+            userStreak = 0;
+        } else {
+            userStreak = parseInt(localStorage.getItem("streak"));
+        }
+        gameWon = localStorage.getItem("gameWon");
         rawOperatorsList = getCleanList();
         todaysOperator = findTodaysOperator();
-        console.log(rawOperatorsList[0])
+        if (!localStorage.getItem("operatorID") === data.id) {
+            localStorage.setItem("gameWon", false);
+        }
     });
 
-    function getAvgGuesses(){ // USE THIS WHEN USER IS DONE WITH THE GAME!!!
-        avgGuesses = (data.allGuesses / data.guessers);
-        return avgGuesses;
+    function getAvgGuesses(){
+        return data.allGuesses / data.guessers;
     }
 
     function findTodaysOperator(){
@@ -69,6 +79,11 @@
             }
         }
     }
+
+    function disableInput() {
+        inputField.disabled = true;
+        buttonField.disabled = true;
+    }
     
     function guess() {
         try {
@@ -98,8 +113,10 @@
         
             if (sameID) {
                 incrementCorrectGuesses();
-                inputField.disabled = true;
-                buttonField.disabled = true;
+                disableInput();
+                localStorage.setItem("gameWon", true);
+                localStorage.setItem("operatorID", data.id);
+                localStorage.setItem("userGuesses", userGuesses);
                 setTimeout(() => {
                     activeConfetti.set(true);
                     showSuccess = true;
@@ -169,7 +186,7 @@
         return operator.meta.gender;
     }
     </script>
-    
+
 <div class = "classic-container">
     <div class = "informat">
         <h1>Guess today's operator!</h1>
@@ -177,6 +194,7 @@
         <div class="sub-informat">
             <p class="guessers">{data.guessers} have guessed correctly so far!</p>
             <Message/>
+            <div class="streak-display"><i class="fa-solid fa-fire-flame-curved"></i><p class="streak-paragraph">{userStreak}</p></div>
         </div>
     </div>
     <div class = "game">
@@ -203,6 +221,10 @@
         </div>
     </div>
     <div class="hidden">{hide = false}</div>
+    {#if gameWon}
+        <div class="hidden">{disableInput()}</div>
+        <VictoryScreen operator={todaysOperator} data={data} averageGuesses={getAvgGuesses}/>
+    {/if}
     {#if allGuesses.length > 0}
     <div class="description-container">
         <div>Operator</div>
@@ -240,72 +262,21 @@
         {/each}
     </div>
     {#if showSuccess}
-    <div class="success-message" transition:fade>
-        <div class="success-content">
-        <h2>Gurrr aim!</h2>
-        <p>You correctly guessed <span>{todaysOperator.name}</span>!</p>
-        <img src="opicons/{todaysOperator.id}.svg/" alt="" />
-        {#if (data.guessers % 10 === 1)}
-            <div>You are the <span>{data.guessers}st</span> to guess today's mystery operator correctly!</div>
-        {:else if (data.guessers % 10 === 2)}
-            <div>You are the <span>{data.guessers}nd</span> to guess today's mystery operator correctly!</div>
-        {:else if (data.guessers % 10 === 3)}
-            <div>You are the <span>{data.guessers}rd</span> to guess today's mystery operator correctly!</div>
-        {:else}
-            <div>You are the <span>{data.guessers}th</span> to guess today's mystery operator correctly!</div>
-        {/if}
-        {#if (userGuesses > Math.round(getAvgGuesses()))}
-            <div>It takes an average of <span>{Math.round(getAvgGuesses())}</span> tries to guess this operator correctly, whereas it took you <span>{userGuesses}</span> tries! Unlucky!</div>
-        {:else if (userGuesses < Math.round(getAvgGuesses()))}
-            <div>It takes an average of <span>{Math.round(getAvgGuesses())}</span> tries to guess this operator correctly, whereas it took you <span>{userGuesses}</span> tries! Well done!</div>
-        {:else}
-            <div>It takes an average of <span>{Math.round(getAvgGuesses())}</span> tries to guess this operator correctly, whereas it took you <span>{userGuesses}</span> tries! Bang average!</div>
-        {/if}
-        </div>
-    </div>
+        <VictoryScreen operator={todaysOperator} data={data} userGuesses={userGuesses} averageGuesses={getAvgGuesses}/>
     {/if}
 </div>
     
 <style>
-span{
-    font-weight: bold
+.streak-display{
+    display: relative;
 }
-
-.success-message {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    max-width: 30rem;
-    background-color: #1a1a1a;
-    color: white;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    text-align: center;
-    z-index: 10;
-  }
-
-  .success-message img {
-    width: 100px;
-    height: 100px;
-  }
-
-  .success-message h2 {
-    color: #00ff00;
-  }
-
-  .success-message p {
-    margin: 0.5rem 0;
-  }
 
 .sub-informat{
     position: relative;
     display: grid;
     justify-items: center;
     align-items: center;
-    grid-template-columns: 3fr 1fr;
+    grid-template-columns: 3fr 1fr 0.5fr;
 }
 
 .guessers{
@@ -417,12 +388,13 @@ span{
 
 input {
     padding: 1.2rem;
-    font-size: 1.25em;
+    font-size: 1.2em;
     border-radius: 1rem;
     border: 1rem;
     background-color: #1a1a1a;
     transition: border-color 0.25s;
     box-shadow: 2px 2px 2px #0D0D0D;
+    font-style: italic;
 }
 
 .submit {
